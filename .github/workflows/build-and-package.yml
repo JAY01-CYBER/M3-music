@@ -1,0 +1,39 @@
+name: Build and Package M3 Music
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Build app
+        run: npm run build
+
+      - name: Create zip artifact
+        run: |
+          cd dist
+          zip -r ../m3-music-web-build.zip .
+
+      - name: Upload downloadable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: m3-music-web-build
+          path: |
+            dist
+            m3-music-web-build.zip
